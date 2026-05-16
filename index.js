@@ -22,7 +22,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/servic
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
-    console.log('Successfully connected to MongoDB database: service-request-board');
+    console.log('Successfully connected to MongoDB database');
   })
   .catch((error) => {
     console.error('Error connecting to MongoDB:', error.message);
@@ -34,7 +34,8 @@ app.use((err, req, res, next) => {
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
     return res.status(400).json({ message: 'Invalid ID format' });
   }
-  res.status(500).json({ message: 'Something went wrong on the server' });
+  // In production, send the exact error message so you can debug on Railway!
+  res.status(500).json({ message: err.message || 'Something went wrong on the server', error: process.env.NODE_ENV === 'development' ? err : {} });
 });
 
 // Basic Health Check Route
